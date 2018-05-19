@@ -1,0 +1,116 @@
+---
+title: "Estruturação de dados do DOU"
+author: "Tomás Barcellos"
+date: "22 de maio de 2018"
+output:
+    beamer_presentation:
+      colortheme: crane
+      fig_height: 4
+      fig_width: 9
+      highlight: tango
+      slide_level: 2
+      theme: Malmoe
+---
+
+# O Problema
+
+## A fonte
+
+O Diário Oficial da União (DOU) é importante fonte de informações oficiais 
+consultadas por diversos atores sociais. A informações publicadas no DOU são 
+publicadas em formato de textos, tabelas e imagens, dados não-estrturados.
+
+## A fonte
+
+![](inst/doc/DOU.png)  
+
+## Os desafios
+
+Até dezemebro 2017 a Imprensa Nacional disponibilizada o DOU somente em PDF. 
+
+A partir de dezembro de 2017 o DOU passa a ser publicado também em HTML (com erros).
+
+## Os desafios
+
+![](inst/doc/DOU_MAPA.png)  
+
+# A solução proposta
+
+## rDOU: Etapas de processamento
+
+O seguinte fluxo de trabalho foi adotado:
+
+1. Download de todos as páginas do DOU (PDF) do dia;
+2. Conversão dos PDFs em TXTs pelo Word;
+3. Processamento dos arquivos TXT para estruturar a informação; e
+4. Validação humana da informação processada.
+
+## rDOU: download
+
+```{r, eval = FALSE}
+# devtools::install_github("projdiario/projdiario", subdir = "R/rDOU")
+library(rDOU)
+download_dou("02/03/2017", dest_dir = "pdf")
+```
+
+A função `download_dou()` faz o download das páginas do DOU, em PDF.
+A função é chamada pelo seu efeito colateral (baixar) e retorna 
+`dest_dir` (invisível).
+
+## rDOU: conversão
+
+```{r, eval = FALSE}
+paginas <- converter_pdf(dir_pdf = "pdf", secao = 1, 
+                         data = "02/03/2017",
+                         dest_dir = "txt")
+```
+
+A função `converter_pdf()` faz a conversão das páginas do DOU de PDF para TXT.
+A função é chamada pelo seu efeito colateral e retorna um vetor 
+com o nome dos arquivos TXT criados (invisível).
+
+```{r, echo = FALSE}
+library(rDOU)
+paginas <- dir("inst/doc/txt/DOU1/2017/março/02", 
+               full.names = TRUE, recursive = TRUE)
+```
+
+## rDOU: processamento
+
+```{r}
+agric <- extrair_normas(paginas, "Agricultura")
+faz <- extrair_normas(paginas, "Fazenda")
+str(agric, give.attr = FALSE, vec.len = 1)
+```
+
+## rDOU: processamento
+
+```{r}
+# Objetos "norma" possuem alguns atributos
+str(attributes(faz), vec.len = 1)
+```
+
+
+## rDOU: estruturação das informações
+
+```{r, eval = FALSE}
+df_agric <- estruturar_normas(agric)
+dplyr::glimpse(df_agric)
+```
+
+```{r, echo = FALSE}
+df_agric <- readRDS("df_agric.RDS")
+dplyr::glimpse(df_agric)
+```
+
+## Usando o pipe
+
+```{r, eval = FALSE}
+library(magrittr)
+download_dou("02/03/2017", dest_dir = "pdf") %>% 
+  converter_pdf(1, "02/03/2017", "txt") %>% 
+  pegar_normas_dou(orgao_alvo = "Agricultura") %>% 
+  estruturar_normas()
+```
+
+
