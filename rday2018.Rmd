@@ -12,6 +12,12 @@ output:
       theme: Malmoe
 ---
 
+## Caminho
+
+1. O problema
+2. A solução proposta
+3. Os resultados alcançados
+
 # O Problema
 
 ## A fonte
@@ -30,13 +36,21 @@ Até dezemebro 2017 a Imprensa Nacional disponibilizada o DOU somente em PDF.
 
 A partir de dezembro de 2017 o DOU passa a ser publicado também em HTML (com erros).
 
+Falta de padronização dos textos publicados
+
 ## Os desafios
 
 ![](inst/doc/DOU_MAPA.png)  
 
 # A solução proposta
 
-## rDOU: Etapas de processamento
+## Proposta: um pacote R
+
+1. Em linha com os principios do tidyverse
+2. Usar `regex` para identificar as informações publicadas
+
+
+## rdou: Etapas de processamento
 
 O seguinte fluxo de trabalho foi adotado:
 
@@ -45,24 +59,25 @@ O seguinte fluxo de trabalho foi adotado:
 3. Processamento dos arquivos TXT para estruturar a informação; e
 4. Validação humana da informação processada.
 
-## rDOU: download
+## rdou: download
 
 ```{r, eval = FALSE}
-# devtools::install_github("projdiario/projdiario", subdir = "R/rDOU")
-library(rDOU)
+# devtools::install_github("tomasbarcellos/rdou")
+library(rdou)
 download_dou("02/03/2017", dest_dir = "pdf")
 ```
 
 A função `download_dou()` faz o download das páginas do DOU, em PDF.
 A função é chamada pelo seu efeito colateral (baixar) e retorna 
-`dest_dir` (invisível).
+a `data` (invisível).
 
-## rDOU: conversão
+## rdou: conversão
 
 ```{r, eval = FALSE}
-paginas <- converter_pdf(dir_pdf = "pdf", secao = 1, 
-                         data = "02/03/2017",
-                         dest_dir = "txt")
+paginas <- converter_pdf(
+  data = "02/03/2017", secao = 1,
+  dir_pdf = "pdf", dest_dir = "txt"
+¡)
 ```
 
 A função `converter_pdf()` faz a conversão das páginas do DOU de PDF para TXT.
@@ -70,12 +85,12 @@ A função é chamada pelo seu efeito colateral e retorna um vetor
 com o nome dos arquivos TXT criados (invisível).
 
 ```{r, echo = FALSE}
-library(rDOU)
+library(rdou)
 paginas <- dir("inst/doc/txt/DOU1/2017/março/02", 
                full.names = TRUE, recursive = TRUE)
 ```
 
-## rDOU: processamento
+## rdou: processamento
 
 ```{r}
 agric <- extrair_normas(paginas, "Agricultura")
@@ -83,7 +98,7 @@ faz <- extrair_normas(paginas, "Fazenda")
 str(agric, give.attr = FALSE, vec.len = 1)
 ```
 
-## rDOU: processamento
+## rdou: processamento
 
 ```{r}
 # Objetos "norma" possuem alguns atributos
@@ -91,7 +106,7 @@ str(attributes(faz), vec.len = 1)
 ```
 
 
-## rDOU: estruturação das informações
+## rdou: estruturação das informações
 
 ```{r, eval = FALSE}
 df_agric <- estruturar_normas(agric)
@@ -107,10 +122,18 @@ dplyr::glimpse(df_agric)
 
 ```{r, eval = FALSE}
 library(magrittr)
-download_dou("02/03/2017", dest_dir = "pdf") %>% 
-  converter_pdf(1, "02/03/2017", "txt") %>% 
+download_dou("02/03/2017") %>% 
+  converter_pdf(secao = 1) %>% 
   pegar_normas_dou(orgao_alvo = "Agricultura") %>% 
   estruturar_normas()
 ```
 
+# Resultados
 
+## Resultados
+
+* Mais de 13.705 normas encontradas entre os meses de abril de 2015 e dezembro 
+de 2017 nas seções 1 e 2 do DOU para o Ministério da Agricultura, Pecuária e 
+Abastecimento.
+
+* Alimentação semi-automatizada do Sistemas de Consulta a Legislação Agropecuária.

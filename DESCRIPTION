@@ -1,7 +1,7 @@
-Package: rDOU
+Package: rdou
 Type: Package
 Title: Retira Informacoes do Diario Oficial da Uniao
-Version: 0.9.0
+Version: 1.0.0
 Author: Tomas Barcellos
 Maintainer: Tomas Barcellos <tomas.barcellos@agricultura.gov.br>
 Description: Agrupa uma serie de funcoes utilizadas para retirar informacoes

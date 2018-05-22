@@ -228,13 +228,13 @@ desescapar <- stringi::stri_unescape_unicode
 
 #' Download dos PDFs do Diario Oficial da Uniao
 #' @param data Data que sera baixada
-#' @param pdf_dir Pasta onde estao os arquivos PDF 
+#' @param pdf_dir Pasta onde estao os arquivos PDF
 #'
 #' @importFrom reticulate source_python
 #' @export
 download_dou <- function(data, dest_dir) {
   if (!dir.exists(dest_dir)) {
-    message("Pasta '", dest_dir, "' nao encontrda. Criando-a.")
+    message("Pasta '", dest_dir, "' nao encontrada. Criando-a.")
     dir.create(dest_dir)
   }
   config <- reticulate::py_discover_config()
@@ -242,7 +242,7 @@ download_dou <- function(data, dest_dir) {
     path_py3 <- grep("python3", config$python_versions, value = TRUE)[[1]]
     reticulate::use_python(path_py3, TRUE)
   }
-  script <- system.file("python", "downloader.py", package = "rDOU")
+  script <- system.file("python", "downloader.py", package = "rdou")
   ambiente <- new.env()
   reticulate::source_python(script, ambiente)
   ambiente$download(data, normalizePath(dest_dir))
@@ -250,15 +250,16 @@ download_dou <- function(data, dest_dir) {
 }
 
 #' Converter PDFs em TXTs
-#' @param pdf_dir Pasta onde estao os arquivos PDF
+#' @param data Data do DOU
+#' @param secao Secao do DOU
+#' @param pdf_dir Pasta onde ficarao os arquivos PDF
 #' @param txt_dir Pasta onde ficarao os arquivos TXT
 #'
 #' @importFrom reticulate source_python
 #' @export
-converter_pdf <- function(dir_pdf = "pdf", secao, data,
-                          dest_dir = "txt") {
+converter_pdf <- function(data, secao, dir_pdf = "pdf", dest_dir = "txt") {
   if (!dir.exists(dest_dir)) {
-    message("Pasta '", dest_dir, "' nao encontrda. Criando-a.")
+    message("Pasta '", dest_dir, "' nao encontrada. Criando-a.")
     dir.create(dest_dir)
   }
 
@@ -268,7 +269,7 @@ converter_pdf <- function(dir_pdf = "pdf", secao, data,
     warning("Esta funcao provavelmente nao funcionara fora do Windows.", call. = FALSE)
     Sys.getlocale("LC_TIME")
   })
-                  
+
   dt_data <- lubridate::dmy(data)
 
   ano <- lubridate::year(dt_data)
@@ -289,25 +290,24 @@ converter_pdf <- function(dir_pdf = "pdf", secao, data,
   }
 
   arg2 <- stringr::str_replace_all(normalizePath(dest_dir), "\\\\", "/")
-  
+
   # config <- reticulate::py_discover_config()
   # if (config$version < 3) {
   #   path_py3 <- grep("python3", config$python_versions, value = TRUE)[[1]]
   #   reticulate::use_python(path_py3, TRUE)
   # }
 
-  script <- system.file("python", "converter.py", package = "rDOU")
-  
+  script <- system.file("python", "converter.py", package = "rdou")
+
   # ambiente <- new.env()
   # reticulate::source_python(script, ambiente)
   # ambiente$converter(arg1, arg2)
-  
+
   comando <- paste("python", script, arg1, arg2)
-  
+
   system(comando, TRUE)
   retorno <- paste0(arg2, "/DOU", secao, "/", ano, "/", mes, "/", dia)
-  
+
   invisible( dir(retorno, full.names = TRUE) )
 }
-
 
