@@ -311,3 +311,6 @@ converter_pdf <- function(data, secao, dir_pdf = "pdf", dest_dir = "txt") {
   invisible( dir(retorno, full.names = TRUE) )
 }
 
+#' @importFrom magrittr %>%
+#' @export
+magrittr::`%>%`

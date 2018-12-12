@@ -4,10 +4,14 @@
 \alias{converter_pdf}
 \title{Converter PDFs em TXTs}
 \usage{
-converter_pdf(dir_pdf = "pdf", secao, data, dest_dir = "txt")
+converter_pdf(data, secao, dir_pdf = "pdf", dest_dir = "txt")
 }
 \arguments{
-\item{pdf_dir}{Pasta onde estao os arquivos PDF}
+\item{data}{Data do DOU}
+
+\item{secao}{Secao do DOU}
+
+\item{pdf_dir}{Pasta onde ficarao os arquivos PDF}
 
 \item{txt_dir}{Pasta onde ficarao os arquivos TXT}
 }

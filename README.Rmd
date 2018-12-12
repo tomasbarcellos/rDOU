@@ -1,0 +1,57 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# Introdução
+
+## Instalação
+
+```{r, eval = FALSE}
+# install.packages("devtools")
+devtools::install_github("tomasbarcellos/rdou")
+```
+
+## Exemplo de uso
+
+### Extração das normas desejadas
+
+```{r}
+raiz <- system.file("doc", "txt", "DOU1", "2017", "março", "02", package = "rdou")
+paginas <- dir(raiz, full.names = TRUE, recursive = TRUE)
+
+library(rdou)
+agric <- extrair_normas(paginas, "Agricultura")
+faz <- extrair_normas(paginas, "Fazenda")
+str(agric, give.attr = FALSE, vec.len = 1)
+
+str(attributes(faz), vec.len = 1)
+```
+
+
+### Tabulação das normas
+
+```{r}
+df_agric <- estruturar_normas(agric)
+dplyr::glimpse(df_agric)
+```
+
+## Usando o pipe
+
+```{r, eval = FALSE}
+download_dou("02/03/2017") %>% 
+  converter_pdf(secao = 1) %>% 
+  pegar_normas_dou(orgao_alvo = "Agricultura") %>% 
+  estruturar_normas()
+```
+

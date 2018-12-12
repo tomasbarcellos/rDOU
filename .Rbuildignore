@@ -1,3 +1,4 @@
+^README\.Rmd$
 ^\.Rprofile$
 ^.*\.Rproj$
 ^\.Rproj\.user$
